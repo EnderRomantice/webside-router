@@ -23,7 +23,7 @@ function TabbarItem({
 export default function TabBar() {
   const { isDark, toggle } = useTheme();
   const border = isDark ? "border-white" : "border-black";
-  const text = isDark ? "text-black" : "text-white";
+  const text = isDark ? "text-white" : "text-black";
 
   const tabbarRef = useRef<HTMLDivElement | null>(null);
 

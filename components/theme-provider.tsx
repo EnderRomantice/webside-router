@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useSyncExternalStore } from 'react';
 
 type ThemeContextValue = {
   isDark: boolean;
@@ -10,22 +10,55 @@ type ThemeContextValue = {
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [isDark, setIsDark] = useState<boolean>(true);
+function getServerSnapshot() {
+  return true;
+}
 
-  useEffect(() => {
-    const stored = localStorage.getItem('theme');
-    if (stored === 'light') {
-      setIsDark(false);
-      return;
-    }
-    if (stored === 'dark') {
-      setIsDark(true);
-      return;
-    }
-    const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
-    setIsDark(!!prefersDark);
-  }, []);
+function getSnapshot() {
+  const stored = localStorage.getItem('theme');
+  if (stored === 'light') return false;
+  if (stored === 'dark') return true;
+  const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+  return !!prefersDark;
+}
+
+const listeners = new Set<() => void>();
+
+function subscribe(callback: () => void) {
+  listeners.add(callback);
+  const media = window.matchMedia('(prefers-color-scheme: dark)');
+  const onChange = () => callback();
+  media.addEventListener('change', onChange);
+  const onStorage = (e: StorageEvent) => {
+    if (e.key === 'theme') callback();
+  };
+  window.addEventListener('storage', onStorage);
+  return () => {
+    listeners.delete(callback);
+    media.removeEventListener('change', onChange);
+    window.removeEventListener('storage', onStorage);
+  };
+}
+
+function setTheme(nextDark: boolean) {
+  const root = document.documentElement;
+  if (nextDark) {
+    root.classList.remove('light');
+    localStorage.setItem('theme', 'dark');
+  } else {
+    root.classList.add('light');
+    localStorage.setItem('theme', 'light');
+  }
+  listeners.forEach((cb) => cb());
+}
+
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const isDark = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+
+  const value = useMemo(
+    () => ({ isDark, setDark: (v: boolean) => setTheme(v), toggle: () => setTheme(!isDark) }),
+    [isDark]
+  );
 
   useEffect(() => {
     const root = document.documentElement;
@@ -37,11 +70,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem('theme', 'light');
     }
   }, [isDark]);
-
-  const value = useMemo(
-    () => ({ isDark, setDark: setIsDark, toggle: () => setIsDark((v) => !v) }),
-    [isDark]
-  );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
