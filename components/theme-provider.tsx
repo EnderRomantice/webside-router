@@ -11,14 +11,21 @@ type ThemeContextValue = {
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return true;
+  const [isDark, setIsDark] = useState<boolean>(true);
+
+  useEffect(() => {
     const stored = localStorage.getItem('theme');
-    if (stored === 'light') return false;
-    if (stored === 'dark') return true;
+    if (stored === 'light') {
+      setIsDark(false);
+      return;
+    }
+    if (stored === 'dark') {
+      setIsDark(true);
+      return;
+    }
     const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
-    return !!prefersDark;
-  });
+    setIsDark(!!prefersDark);
+  }, []);
 
   useEffect(() => {
     const root = document.documentElement;

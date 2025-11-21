@@ -25,17 +25,17 @@ export default function TabBar() {
   const border = isDark ? "border-white" : "border-black";
   const text = isDark ? "text-black" : "text-white";
 
-  const tabbarRef = useRef(null);
+  const tabbarRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    gsap.set(tabbarRef.current, { y: 500 });
+    const ctx = gsap.context(() => {
+      const el = tabbarRef.current;
+      if (!el) return;
+      gsap.set(el, { y: 500 });
+      gsap.to(el, { y: 0, duration: 0.5, ease: "power2.out", delay: 0.7 });
+    }, tabbarRef);
 
-    gsap.to(tabbarRef.current, {
-      y: 0, // 目标y坐标
-      duration: 0.5, // 动画持续时间
-      ease: "power2.out", // 缓动函数
-      delay: 0.7,
-    });
+    return () => ctx.revert();
   }, []);
   return (
     <div
