@@ -21,9 +21,7 @@ function TabbarItem({
 }
 
 export default function TabBar() {
-  const { isDark, toggle } = useTheme();
-  const border = isDark ? "border-white" : "border-black";
-  const text = isDark ? "text-white" : "text-black";
+  const { toggle } = useTheme();
 
   const tabbarRef = useRef<HTMLDivElement | null>(null);
 
@@ -40,20 +38,14 @@ export default function TabBar() {
   return (
     <div
       ref={tabbarRef}
-      className={`p-10 fixed bottom-20 left-1/2 transform -translate-x-1/2 md:w-100 w-80 h-14 ${border} border-4 ${text} rounded-4xl flex items-center justify-around gap-6 cursor-pointer`}
+      className={`px-6 py-3 fixed bottom-6 md:bottom-12 left-1/2 -translate-x-1/2 w-[92vw] max-w-lg md:max-w-xl h-14 border-2 rounded-2xl bg-surface/90 backdrop-blur text-foreground border-border shadow-md z-50 flex items-center justify-around gap-6 cursor-pointer`}
     >
       <TabbarItem>
-        <Home
-          className="w-10 h-10 rounded-2xl"
-          textColor={isDark ? "#FFFFFF" : "#111111"}
-        />
+        <Home className="w-8 h-8 sm:w-9 sm:h-9" />
       </TabbarItem>
 
       <TabbarItem onClick={toggle}>
-        <Sun
-          className="w-10 h-10 rounded-2xl"
-          textColor={isDark ? "#FFFFFF" : "#111111"}
-        />
+        <Sun className="w-8 h-8 sm:w-9 sm:h-9" />
       </TabbarItem>
     </div>
   );
