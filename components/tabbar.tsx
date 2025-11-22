@@ -30,7 +30,7 @@ export default function TabBar() {
       const el = tabbarRef.current;
       if (!el) return;
       gsap.set(el, { y: 500 });
-      gsap.to(el, { y: 0, duration: 0.5, ease: "power2.out", delay: 0.7 });
+      gsap.to(el, { y: 0, duration: 0.5, ease: "power2.out", delay: 0.5 });
     }, tabbarRef);
 
     return () => ctx.revert();
