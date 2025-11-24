@@ -16,9 +16,21 @@ const websites = [
   },
   {
     id: 3,
-    name: "Rust",
-    img: "../rust.png",
-    url: "https://rust-lang.org/",
+    name: "React",
+    img: "../react.svg",
+    url: "https://react.dev/",
+  },
+  {
+    id: 4,
+    name: "X",
+    img: "../x.svg",
+    url: "https://x.com/",
+  },
+  {
+    id: 5,
+    name: "LinkedIn",
+    img: "../linkedin.svg",
+    url: "https://linkedin.com/",
   },
 ];
 
